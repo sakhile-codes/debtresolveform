@@ -76,8 +76,8 @@ creds_dict = json.loads(creds_json)
 credentials = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
 
 # Test token
-request = google.auth.transport.requests.Request()
-credentials.refresh(request)
+requesting = google.auth.transport.requests.Request()
+credentials.refresh(requesting)
 print("✅ Service account key is valid. Token acquired.")
 
 # Authorize gspread
