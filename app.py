@@ -36,12 +36,12 @@ POSTGRES_CONNECTION_STRING = os.environ.get('POSTGRES_CONNECTION_STRING') or "po
 # # Function to initialize the databases and create tables
 
 
-# # Google Sheets configuration
-# SCOPES = [
-#     "https://www.googleapis.com/auth/spreadsheets",
-#     "https://www.googleapis.com/auth/drive"
-# ]
-# SPREADSHEET_ID = os.getenv("SPREADSHEET_ID", "1nsmZ-YDsWiy9745MFr8D595Z0SCSBFUgvkoSsA17eYE")
+# Google Sheets configuration
+SCOPES = [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive"
+]
+SPREADSHEET_ID = os.getenv("SPREADSHEET_ID", "1nsmZ-YDsWiy9745MFr8D595Z0SCSBFUgvkoSsA17eYE")
 
 # # Load credentials
 # SERVICE_ACCOUNT_FILE = os.getenv("GOOGLE_CREDS_JSON")
@@ -63,22 +63,17 @@ POSTGRES_CONNECTION_STRING = os.environ.get('POSTGRES_CONNECTION_STRING') or "po
 # gc = gspread.authorize(credentials)
 # sheet = gc.open_by_key(SPREADSHEET_ID).sheet1  # First sheet
 
-SCOPES = [
-    "https://www.googleapis.com/auth/spreadsheets",
-    "https://www.googleapis.com/auth/drive"
-]
-
-SPREADSHEET_ID = os.getenv("SPREADSHEET_ID", "1nsmZ-YDsWiy9745MFr8D595Z0SCSBFUgvkoSsA17eYE")
 
 # Load service account from env variable
 creds_json = os.getenv("GOOGLE_CREDS_JSON")
 if not creds_json:
     raise RuntimeError("Missing GOOGLE_CREDS_JSON environment variable")
 
+# Parse the JSON string to a dictionary
+creds_dict = json.loads(creds_json)
 
-
-# Use from_service_account_info instead of from_service_account_file
-credentials = Credentials.from_service_account_info(creds_json, scopes=SCOPES)
+# Use from_service_account_info with the dictionary
+credentials = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
 
 # Test token
 request = google.auth.transport.requests.Request()
