@@ -28,6 +28,9 @@ credentials = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes
 gc = gspread.authorize(credentials)
 sheet = gc.open_by_key(SPREADSHEET_ID).sheet1  # First sheet
 
+request = google.auth.transport.requests.Request()
+credentials.refresh(request)
+print("✅ Google Service Account key is valid. Token acquired.")
 # Function to initialize the databases and create tables
 def init_db():
     # SQLite initialization
