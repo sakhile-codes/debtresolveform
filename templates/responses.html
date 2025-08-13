@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+    <title>Participant Responses</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #ffffff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #444;
+        }
+
+        th {
+            background-color: #333;
+        }
+
+        tr:hover {
+            background-color: #333;
+        }
+
+        select, input {
+            background-color: #222;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #00b4d8;
+        }
+
+        @media only screen and (max-width: 768px) {
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+            th {
+                display: none;
+            }
+            td {
+                display: flex;
+                justify-content: space-between;
+                padding: 10px;
+                border-bottom: 1px solid #444;
+            }
+            td::before {
+                content: attr(data-label);
+                flex-basis: 40%;
+                color: #aaa;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Leads Responses</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Surname</th>
+                <th>Phone</th>
+                <th>ID Number</th>
+                <th>Salary Range</th>
+                <th>Debt Review</th>
+                <th>Reason For Assistance</th>
+                <th>Time To Call</th>
+                <th>Status</th>
+                <th>Comment</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for response in responses %}
+            <tr>
+                <td data-label="Name">{{ response[1] }}</td>
+                <td data-label="Surname">{{ response[2] }}</td>
+                <td data-label="Phone">{{ response[3] }}</td>
+                <td data-label="ID Number">{{ response[4] }}</td>
+                <td data-label="Salary Range">{{ response[5] }}</td>
+                <td data-label="Debt Review">{{ response[6] }}</td>
+                <td data-label="Reason For Assistance">{{ response[7] }}</td>
+                <td data-label="Time To Call">{{ response[8] }}</td>
+                <td data-label="Status">
+                    <select onchange="updateResponse('{{ response[0] }}', 'status', this.value)">
+                        <option value="">-- Select --</option>
+                        <option value="Sale">Sale</option>
+                        <option value="Lost">Lost</option>
+                    </select>
+                </td>
+                <td data-label="Comment">
+                    <input type="text" placeholder="Type comment..." 
+                           onblur="updateResponse('{{ response[0] }}', 'comment', this.value)">
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function updateResponse(id, field, value) {
+        fetch('/update_response', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id, field, value })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log(`Updated ${field} for ID ${id} to "${value}"`);
+            } else {
+                alert('Failed to update.');
+            }
+        })
+        .catch(err => console.error(err));
+    }
+</script>
+
+
+</body>
+</html>

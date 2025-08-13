@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debt Solutions - Take Control Today</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-b from-gray-900 to-gray-800 text-white min-h-screen flex items-center justify-center px-4">
+
+    <div class="max-w-3xl text-center">
+        <!-- Header -->
+        <h1 class="text-4xl sm:text-5xl font-extrabold mb-4 leading-tight">
+            Break Free From Debt Stress
+        </h1>
+
+        <!-- Subtitle -->
+        <p class="text-lg sm:text-xl mb-6 text-gray-300">
+            Our expert team will help you consolidate your debt, reduce repayments, 
+            and regain financial freedom — without the overwhelm.
+        </p>
+
+        <!-- Call to Action -->
+        <a href="./form"
+            class="bg-yellow-400 hover:bg-yellow-500 text-black font-semibold px-8 py-3 rounded-full shadow-lg transition transform hover:scale-105 inline-block">
+            Get Your Assessment
+        </a>
+
+
+
+        <!-- Urgency Section -->
+        <p id="countdown" class="mt-8 text-lg font-semibold text-yellow-400"></p>
+    </div>
+
+    <!-- JavaScript for Urgency Countdown -->
+    <script>
+        // Countdown for urgency (optional)
+        const countdownEl = document.getElementById('countdown');
+        let timeLeft = 45; // seconds
+        const updateCountdown = () => {
+            countdownEl.textContent = `Offer ends in ${timeLeft} seconds – act now!`;
+            timeLeft--;
+            if (timeLeft < 0) {
+                countdownEl.textContent = "Limited offer expired – contact us for next steps!";
+                clearInterval(timer);
+            }
+        };
+        const timer = setInterval(updateCountdown, 1000);
+        updateCountdown();
+    </script>
+
+</body>
+</html>

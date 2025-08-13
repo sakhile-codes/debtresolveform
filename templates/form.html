@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+
+    <title>Let Us Get To Know You</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .dialog-container {
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            max-width: 500px;
+            padding: 30px;
+            animation: fadeIn 0.5s ease-in-out;
+            position: relative;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #ffffff;
+        }
+
+        input[type="text"], input[type="email"], input[type="tel"], select {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            box-sizing: border-box;
+            border: none;
+            border-radius: 5px;
+            background-color: #333;
+            color: #fff;
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background-color: #28a745;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #218838;
+        }
+
+        .progress-bar {
+            width: 100%;
+            background-color: #444;
+            height: 8px;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress {
+            height: 100%;
+            background-color: #28a745;
+            width: 0%;
+            transition: width 0.5s ease-in-out;
+        }
+
+        .personalized-message {
+            font-style: italic;
+            color: #aaa;
+        }
+
+        /* Mobile-friendly adjustments */
+        @media only screen and (max-width: 600px) {
+            .dialog-container {
+                padding: 20px;
+                margin: 0 10px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            input[type="text"], input[type="email"], input[type="tel"], select, input[type="submit"] {
+                padding: 10px;
+            }
+        }
+
+        /* Full-screen experience */
+        .full-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Flash message styling */
+        .flash-messages {
+            text-align: center;  /* Center the text */
+            margin-top: 20px;
+        }
+
+        .flash-list {
+            list-style: none; /* Remove bullet points */
+            padding: 0;
+        }
+
+        .flash-message {
+            color: red;         /* Make the text red */
+            font-weight: bold;  /* Make the text bold */
+            background-color: #ffe6e6;  /* Light red background */
+            display: inline-block;  /* Ensure the message width is based on its content */
+            padding: 10px 20px;
+            border-radius: 5px;  /* Add rounded corners */
+            text-align: center;  /* Center the message text */
+            max-width: 80%;      /* Constrain the message width for better readability */
+        }
+
+    </style>
+    <script>
+        function updateProgressBar(progressPercentage) {
+            const progressBar = document.querySelector('.progress');
+            progressBar.style.width = progressPercentage + '%'; // Update progress bar width
+        }
+
+        function handleFormSubmit(event) {
+            event.preventDefault(); // Prevent form submission to wait for animation
+            const container = document.querySelector('.dialog-container');
+            container.classList.add('fade-out');
+
+            setTimeout(() => {
+                event.target.submit(); // Submit form after fade-out animation
+            }, 500); // Wait for animation to complete before submitting
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const currentStep = parseInt(document.getElementById('currentStep').value);
+            const totalSteps = parseInt(document.getElementById('totalSteps').value);
+            const progressPercentage = (currentStep / totalSteps) * 100;
+
+            updateProgressBar(progressPercentage);
+        });
+    </script>
+</head>
+<body>
+    <div class="full-screen">
+        <div class="dialog-container">
+            <!-- Personalized message if user_name exists -->
+            {% if user_name and next_step > 0 %}
+                <p class="personalized-message">Thanks {{ user_name }} ! Let's continue with the next question.</p>
+            {% endif %}
+
+            <!-- Flash message handling -->
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        <ul class="flash-list">
+                            {% for message in messages %}
+                                <li class="flash-message">{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <!-- Progress Bar -->
+            <div class="progress-bar">
+                <div class="progress"></div>
+            </div>
+
+            <!-- Display current question -->
+            <h1>{{ step.question }}</h1>
+
+            <!-- Form for the current step -->
+            <form method="POST" onsubmit="handleFormSubmit(event)">
+                <input type="hidden" name="step" value="{{ step.name }}">
+                <input type="hidden" name="next_step" value="{{ next_step }}">
+                <input type="hidden" id="currentStep" value="{{ next_step }}"> <!-- Current step index -->
+                <input type="hidden" id="totalSteps" value="{{ total_steps }}"> <!-- Total number of steps -->
+
+                {% if step.options %}
+                    <select name="{{ step.name }}" required>
+                        {% for option in step.options %}
+                            <option value="{{ option }}">{{ option }}</option>
+                        {% endfor %}
+                    </select>
+                {% else %}
+                    <input type="text" name="response" required autofocus>
+                {% endif %}
+
+                <br>
+                <input type="submit" value="Next">
+            </form>
+
+        </div>
+    </div>
+</body>
+</html>

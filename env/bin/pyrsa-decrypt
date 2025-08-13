@@ -1,0 +1,9 @@
+#!/bin/sh
+'''exec' "/Users/sakhilemlambo/Desktop/Progression/forex_leads-f7c3ec0db9056f308f7716213d875484a8b55260 3/env/bin/python3" "$0" "$@"
+' '''
+import sys
+from rsa.cli import decrypt
+if __name__ == '__main__':
+    if sys.argv[0].endswith('.exe'):
+        sys.argv[0] = sys.argv[0][:-4]
+    sys.exit(decrypt())

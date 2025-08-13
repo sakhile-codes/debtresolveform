@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+    <title>Participant Responses</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #ffffff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #444;
+        }
+
+        th {
+            background-color: #333;
+        }
+
+        tr:hover {
+            background-color: #333;
+        }
+
+        @media only screen and (max-width: 768px) {
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+
+            th {
+                display: none;
+            }
+
+            td {
+                display: flex;
+                justify-content: space-between;
+                padding: 10px;
+                border-bottom: 1px solid #444;
+            }
+
+            td::before {
+                content: attr(data-label);
+                flex-basis: 40%;
+                color: #aaa;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Participant Responses</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Budget</th>
+                    <th>Interest</th>
+                    <th>Industry</th>
+                    <th>Messages Per Day</th>
+                    <th>Timeline</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for response in responses %}
+                <tr>
+                    <td data-label="Name">{{ response[1] }}</td>
+                    <td data-label="Email">{{ response[2] }}</td>
+                    <td data-label="Phone">{{ response[3] }}</td>
+                    <td data-label="Budget">{{ response[4] }}</td>
+                    <td data-label="Interest">{{ response[5] }}</td>
+                    <td data-label="Industry">{{ response[6] }}</td>
+                    <td data-label="Messages Per Day">{{ response[7] }}</td>
+                    <td data-label="Timeline">{{ response[8] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>
