@@ -75,12 +75,10 @@ creds_json = os.getenv("GOOGLE_CREDS_JSON")
 if not creds_json:
     raise RuntimeError("Missing GOOGLE_CREDS_JSON environment variable")
 
-# Fix \n in private_key
-creds_json = creds_json.replace("\\n", "\n")
-creds_dict = json.loads(creds_json)
+
 
 # Use from_service_account_info instead of from_service_account_file
-credentials = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
+credentials = Credentials.from_service_account_info(creds_json, scopes=SCOPES)
 
 # Test token
 request = google.auth.transport.requests.Request()
