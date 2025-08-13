@@ -36,32 +36,60 @@ POSTGRES_CONNECTION_STRING = os.environ.get('POSTGRES_CONNECTION_STRING') or "po
 # # Function to initialize the databases and create tables
 
 
-# Google Sheets configuration
+# # Google Sheets configuration
+# SCOPES = [
+#     "https://www.googleapis.com/auth/spreadsheets",
+#     "https://www.googleapis.com/auth/drive"
+# ]
+# SPREADSHEET_ID = os.getenv("SPREADSHEET_ID", "1nsmZ-YDsWiy9745MFr8D595Z0SCSBFUgvkoSsA17eYE")
+
+# # Load credentials
+# SERVICE_ACCOUNT_FILE = os.getenv("GOOGLE_CREDS_JSON")
+
+# credentials = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+
+# creds_json = os.getenv("GOOGLE_CREDS_JSON")
+
+
+# # Test key validity
+# try:
+#     request = google.auth.transport.requests.Request()
+#     credentials.refresh(request)
+#     print("✅ Service account key is valid. Token acquired.")
+# except Exception as e:
+#     raise RuntimeError(f"❌ Service account key failed: {e}")
+
+# # Authorize gspread
+# gc = gspread.authorize(credentials)
+# sheet = gc.open_by_key(SPREADSHEET_ID).sheet1  # First sheet
+
 SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive"
 ]
+
 SPREADSHEET_ID = os.getenv("SPREADSHEET_ID", "1nsmZ-YDsWiy9745MFr8D595Z0SCSBFUgvkoSsA17eYE")
 
-# Load credentials
-SERVICE_ACCOUNT_FILE = os.getenv("GOOGLE_CREDS_JSON")
-
-credentials = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
-
+# Load service account from env variable
 creds_json = os.getenv("GOOGLE_CREDS_JSON")
+if not creds_json:
+    raise RuntimeError("Missing GOOGLE_CREDS_JSON environment variable")
 
+# Fix \n in private_key
+creds_json = creds_json.replace("\\n", "\n")
+creds_dict = json.loads(creds_json)
 
-# Test key validity
-try:
-    request = google.auth.transport.requests.Request()
-    credentials.refresh(request)
-    print("✅ Service account key is valid. Token acquired.")
-except Exception as e:
-    raise RuntimeError(f"❌ Service account key failed: {e}")
+# Use from_service_account_info instead of from_service_account_file
+credentials = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
+
+# Test token
+request = google.auth.transport.requests.Request()
+credentials.refresh(request)
+print("✅ Service account key is valid. Token acquired.")
 
 # Authorize gspread
 gc = gspread.authorize(credentials)
-sheet = gc.open_by_key(SPREADSHEET_ID).sheet1  # First sheet
+sheet = gc.open_by_key(SPREADSHEET_ID).sheet1
 
 def init_db():
     # SQLite initialization
