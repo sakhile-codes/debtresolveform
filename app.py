@@ -6,8 +6,10 @@ import sqlite3
 import psycopg2
 from psycopg2 import extras
 import gspread
+import json
 from google.oauth2.service_account import Credentials
-
+import google.auth.transport.requests
+import gspread
 
 
 app = Flask(__name__)
@@ -19,19 +21,56 @@ executor = ThreadPoolExecutor(max_workers=3)
 # PostgreSQL connection string (set as an environment variable or config)
 POSTGRES_CONNECTION_STRING = os.environ.get('POSTGRES_CONNECTION_STRING') or "postgresql://neondb_owner:WaeG1Jp6ODRE@ep-quiet-bonus-a5798w3c-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require" 
 
-# Google Sheets setup
-SERVICE_ACCOUNT_FILE = 'service_account.json'
-SCOPES = ["https://www.googleapis.com/auth/spreadsheets",
-    "https://www.googleapis.com/auth/drive"]
-SPREADSHEET_ID = "1nsmZ-YDsWiy9745MFr8D595Z0SCSBFUgvkoSsA17eYE"
-credentials = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+# # Google Sheets setup
+# SERVICE_ACCOUNT_FILE = 'service_account.json'
+# SCOPES = ["https://www.googleapis.com/auth/spreadsheets",
+#     "https://www.googleapis.com/auth/drive"]
+# SPREADSHEET_ID = "1nsmZ-YDsWiy9745MFr8D595Z0SCSBFUgvkoSsA17eYE"
+# credentials = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+# gc = gspread.authorize(credentials)
+# sheet = gc.open_by_key(SPREADSHEET_ID).sheet1  # First sheet
+
+# request = google.auth.transport.requests.Request()
+# credentials.refresh(request)
+# print("✅ Google Service Account key is valid. Token acquired.")
+# # Function to initialize the databases and create tables
+
+
+# Google Sheets configuration
+SCOPES = [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive"
+]
+SPREADSHEET_ID = os.getenv("SPREADSHEET_ID", "1nsmZ-YDsWiy9745MFr8D595Z0SCSBFUgvkoSsA17eYE")
+
+# Load credentials
+SERVICE_ACCOUNT_FILE = "service_account.json"
+if os.path.exists(SERVICE_ACCOUNT_FILE):
+    # Local: load from JSON file
+    credentials = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+else:
+    # Render: load from environment variable
+    creds_json = os.getenv("GOOGLE_CREDS_JSON")
+    if not creds_json:
+        raise RuntimeError("Missing GOOGLE_CREDS_JSON environment variable for Google Sheets")
+    
+    # Fix newline characters in private_key
+    creds_json = creds_json.replace("\\n", "\n")
+    creds_dict = json.loads(creds_json)
+    credentials = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
+
+# Test key validity
+try:
+    request = google.auth.transport.requests.Request()
+    credentials.refresh(request)
+    print("✅ Service account key is valid. Token acquired.")
+except Exception as e:
+    raise RuntimeError(f"❌ Service account key failed: {e}")
+
+# Authorize gspread
 gc = gspread.authorize(credentials)
 sheet = gc.open_by_key(SPREADSHEET_ID).sheet1  # First sheet
 
-request = google.auth.transport.requests.Request()
-credentials.refresh(request)
-print("✅ Google Service Account key is valid. Token acquired.")
-# Function to initialize the databases and create tables
 def init_db():
     # SQLite initialization
     sqlite_conn = sqlite3.connect('app.db')
