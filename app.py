@@ -44,20 +44,12 @@ SCOPES = [
 SPREADSHEET_ID = os.getenv("SPREADSHEET_ID", "1nsmZ-YDsWiy9745MFr8D595Z0SCSBFUgvkoSsA17eYE")
 
 # Load credentials
-SERVICE_ACCOUNT_FILE = "service_account.json"
-if os.path.exists(SERVICE_ACCOUNT_FILE):
-    # Local: load from JSON file
-    credentials = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
-else:
-    # Render: load from environment variable
-    creds_json = os.getenv("GOOGLE_CREDS_JSON")
-    if not creds_json:
-        raise RuntimeError("Missing GOOGLE_CREDS_JSON environment variable for Google Sheets")
-    
-    # Fix newline characters in private_key
-    creds_json = creds_json.replace("\\n", "\n")
-    creds_dict = json.loads(creds_json)
-    credentials = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
+SERVICE_ACCOUNT_FILE = os.getenv("GOOGLE_CREDS_JSON")
+
+credentials = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+
+creds_json = os.getenv("GOOGLE_CREDS_JSON")
+
 
 # Test key validity
 try:
